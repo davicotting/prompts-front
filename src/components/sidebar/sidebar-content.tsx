@@ -7,18 +7,40 @@ import {
   X as CloseButton,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { startTransition, useState } from 'react';
 import { Logo } from '../logo';
 import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 
-export const SidebarContent = () => {
+type Prompt = {
+  id: string;
+  title: string;
+  content: string;
+};
+
+export interface SidebarContentProps {
+  prompts: Prompt[];
+}
+
+export function SidebarContent({ prompts }: SidebarContentProps) {
   const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [query, setQuery] = useState('');
 
   const collapsedSidebar = () => setIsCollapsed(true);
   const expandSidebar = () => setIsCollapsed(false);
 
   const handleNewPrompt = () => router.push('/new');
+
+  const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuery = event.target.value;
+    setQuery(newQuery);
+
+    startTransition(() => {
+      const url = newQuery ? `/?q=${encodeURIComponent(newQuery)}` : `/`;
+      router.push(url, { scroll: false });
+    });
+  };
 
   return (
     <aside
@@ -61,11 +83,26 @@ export const SidebarContent = () => {
                   onClick={collapsedSidebar}
                   variant="icon"
                   className="hidden md:inline-flex p-2 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-500 rounded-lg transition-colors"
+                  aria-label="Minimizar sidebar"
+                  title="Minimizar sidebar"
                 >
                   <ArrowLeftToLine className="w-5 h-5 text-gray-100" />
                 </Button>
               </header>
             </div>
+
+            <section className="mb-5">
+              <form>
+                <Input
+                  name="q"
+                  type="text"
+                  placeholder="Buscar prompts..."
+                  autoFocus
+                  value={query}
+                  onChange={handleQueryChange}
+                />
+              </form>
+            </section>
 
             <div>
               <Button onClick={handleNewPrompt} className="w-full" size="lg">
@@ -76,6 +113,10 @@ export const SidebarContent = () => {
           </section>
         </>
       )}
+
+      {prompts.map((prompt) => (
+        <p key={prompt.title}>{prompt.title}</p>
+      ))}
     </aside>
   );
-};
+}
