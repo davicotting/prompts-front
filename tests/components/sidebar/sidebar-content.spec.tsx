@@ -61,7 +61,7 @@ describe('SidebarContent', () => {
     });
   });
 
-  describe('open / close', () => {
+  describe('open / collapse', () => {
     it('should render de collapse sidebar button', () => {
       makeSut();
 
@@ -99,9 +99,40 @@ describe('SidebarContent', () => {
       expect(expandSidebarButton).toBeInTheDocument();
       expect(collapseSidebarButton).not.toBeVisible();
     });
+
+    it('should render create prompt button when sidebar is collapsed', async () => {
+      makeSut();
+
+      const collapseSidebarButton = screen.getByRole('button', {
+        name: /Minimizar sidebar/i,
+      });
+
+      await user.click(collapseSidebarButton);
+
+      const createPromptButton = screen.getByRole('button', {
+        name: 'Novo prompt',
+      });
+
+      expect(createPromptButton).toBeVisible();
+    });
+    it('should not render list prompt when sidebar is collapsed', async () => {
+      makeSut();
+
+      const collapseSidebarButton = screen.getByRole('button', {
+        name: /Minimizar sidebar/i,
+      });
+
+      await user.click(collapseSidebarButton);
+
+      const promptList = screen.queryByRole('navigation', {
+        name: 'Lista de prompts',
+      });
+
+      expect(promptList).not.toBeInTheDocument();
+    });
   });
 
-  describe('New propt', () => {
+  describe('New prompt', () => {
     it('should render "new prompt" button', () => {
       makeSut();
 
