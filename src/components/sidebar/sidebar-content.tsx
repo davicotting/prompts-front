@@ -11,6 +11,7 @@ import { startTransition, useState } from 'react';
 import { Logo } from '../logo';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { PromptList } from '../prompts/prompt-list';
 
 type Prompt = {
   id: string;
@@ -116,9 +117,7 @@ export function SidebarContent({ prompts }: SidebarContentProps) {
         </>
       )}
 
-      {prompts.map((prompt) => (
-        <p key={prompt.title}>{prompt.title}</p>
-      ))}
+      <PromptList prompts={prompts} />
     </aside>
   );
 }
