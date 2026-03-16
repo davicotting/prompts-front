@@ -6,9 +6,11 @@ import { render, screen } from '@/lib/test-utils';
 import userEvent from '@testing-library/user-event';
 
 const pushMock = jest.fn();
+let searchParamsMock = new URLSearchParams();
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: pushMock }),
+  useSearchParams: () => searchParamsMock,
 }));
 
 const promptsMock = [
@@ -133,6 +135,18 @@ describe('SidebarContent', () => {
       await user.clear(searchInput);
       const clearLastCall = pushMock.mock.calls.at(-1);
       expect(clearLastCall?.[0]).toBe('/');
+    });
+
+    it('should take the saved query params to put into sidebar search input', () => {
+      const text = 'initial';
+      const searchParams = new URLSearchParams(`q=${text}`);
+      searchParamsMock = searchParams;
+      makeSut();
+
+      const sidebarSearchInput =
+        screen.getByPlaceholderText('Buscar prompts...');
+
+      expect(sidebarSearchInput).toHaveValue(text);
     });
   });
 });
